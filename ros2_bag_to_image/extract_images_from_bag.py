@@ -68,13 +68,13 @@ def main():
             cv_image = cvbridge.imgmsg_to_cv2(decoded_data, desired_encoding='passthrough') # change ROS2 Image to cv2 image
             t = msg[2]
 
-            # Do this to selectively save images from the cv.imshow window
-            cv2.imshow("Frame", cv_image)
-            cv2.waitKey()
+            # # Do this to selectively save images from the cv.imshow window
+            # cv2.imshow("Frame", cv_image)
+            # cv2.waitKey()
 
             # Do this to just save everything to a directory
-            # cv2.imwrite(os.path.join(output_dir_image, "%i.png" % t), cv_image)
-            # print("Wrote image" + str(count) + ": " + str(t) + ".png")
+            cv2.imwrite(os.path.join(output_dir_image, "%i.png" % t), cv_image)
+            print("Wrote image" + str(count) + ": " + str(t) + ".png")
 
             count += 1
 

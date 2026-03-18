@@ -1,6 +1,29 @@
 # ROS2 Bag To Image
 
-This is a simple ROS2 node that opens bag files from `bags/`, looks for the topic `/camera/image_raw`, then saves the image to `/images` under the same bag name and image index, ordered by when the images are read by the bag. While completing this operation, the node will also publish the image to `/image` for real-time monitoring if necessary.
+This is a simple python package that provides two scripts to extract information, i.e. images and LiDAR scans, into offline files. 
+
+# Option 1 - Barebone script for images and cloud
+
+We first provide a barebone script that does the file extraction. 
+This script will read in a user-specified ROS bag, take all the image messages on topic `/camera/image_raw`, and save it without alternating its encoding to a user-designated directory. 
+
+## Usage
+
+To use this script, simply run at the top directory level of this package folder: 
+```
+python ros2_bag_to_image/extract_images_from_bag.py <path/to/bag> <output/path>
+```
+
+## Example
+
+In this [Google Drive folder](https://drive.google.com/drive/folders/1pZpSstLPTSJcQ-2KaaZFc8NeBMKuVD_V), 
+we provide a collection of example ROS bags for the purpose of calibrating the camera intrinsic as well as the camera-LiDAR extrinsic, each of which contains many camera views and LiDAR scans. 
+
+Running the script mentioned above will generate an `/images` folder under the user-designated `/output/path` and extract all images in a bag into it in `.png` format, named using the timestamp of these images in the bag. 
+
+# Option 2 - ROS Node for images
+
+We also provide a simple ROS2 node that opens bag files from `bags/`, looks for the topic `/camera/image_raw`, then saves the image to `/images` under the same bag name and image index, ordered by when the images are read by the bag. While completing this operation, the node will also publish the image to `/image` for real-time monitoring if necessary.
 
 ## Installation
 
