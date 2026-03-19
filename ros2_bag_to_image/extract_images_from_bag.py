@@ -59,22 +59,36 @@ def main():
     converter_options = rosbag2_py.ConverterOptions('', '')
     reader.open(storage_options, converter_options)
 
+    cvbridge = cv_bridge.CvBridge()
+
     count = 0
     while reader.has_next():
         msg = reader.read_next()
         if msg[0] == image_topic:
             decoded_data = deserialize_message(msg[1], Image) # get serialized version of message and decode it
-            cvbridge = cv_bridge.CvBridge()
-            cv_image = cvbridge.imgmsg_to_cv2(decoded_data, desired_encoding='passthrough') # change ROS2 Image to cv2 image
+            # Convert to an 8-bit, viewable format before writing.
+            # 'passthrough' can yield 16-bit/Bayer/YUV which looks "blank" in normal viewers.
+            enc = (decoded_data.encoding or "").lower()
+            if enc in {"16uc1", "mono16"}:
+                cv_image_16 = cvbridge.imgmsg_to_cv2(decoded_data, desired_encoding="passthrough")
+                cv_image = cv2.convertScaleAbs(cv_image_16, alpha=(255.0 / 65535.0))
+            elif enc == "rgb8":
+                cv_rgb = cvbridge.imgmsg_to_cv2(decoded_data, desired_encoding="rgb8")
+                cv_image = cv2.cvtColor(cv_rgb, cv2.COLOR_RGB2BGR)
+            else:
+                cv_image = cvbridge.imgmsg_to_cv2(decoded_data, desired_encoding="bgr8")
             t = msg[2]
 
-            # # Do this to selectively save images from the cv.imshow window
+            # Do this to selectively save images from the cv.imshow window
             # cv2.imshow("Frame", cv_image)
             # cv2.waitKey()
 
             # Do this to just save everything to a directory
-            cv2.imwrite(os.path.join(output_dir_image, "%i.png" % t), cv_image)
-            print("Wrote image" + str(count) + ": " + str(t) + ".png")
+            ok = cv2.imwrite(os.path.join(output_dir_image, f"{t}.png"), cv_image)
+            if not ok:
+                raise RuntimeError("cv2.imwrite failed")
+            # cv2.imwrite(os.path.join(output_dir_image, "%i.png" % t), cv_image)
+            # print("Wrote image" + str(count) + ": " + str(t) + ".png")
 
             count += 1
 
