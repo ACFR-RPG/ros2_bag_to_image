@@ -2,16 +2,21 @@
 
 This is a simple python package that provides two scripts to extract information, i.e. images and LiDAR scans, into offline files. 
 
-# Option 1 - Barebone script for images and cloud
+# Option 1 - Barebone scripts for images and cloud
 
-We first provide a barebone script that does the file extraction. 
-This script will read in a user-specified ROS bag, take all the image messages on topic `/camera/image_raw`, and save it without alternating its encoding to a user-designated directory. 
+We first provide two barebone script that does the file extraction, for images and point clouds separately. 
+
+The script for [image extraction](https://github.com/ACFR-RPG/ros2_bag_to_image/blob/main/ros2_bag_to_image/extract_images_from_bag.py) will read in a user-specified ROS bag, take all the image messages on topic `/camera/image_raw`, and save it without alternating its encoding to a user-designated directory. 
+
+The script for [cloud extraction](https://github.com/ACFR-RPG/ros2_bag_to_image/blob/main/ros2_bag_to_image/extract_pointcloud_from_bag.py) will read in a user-specified ROS bag, take all the point cloud messages on topic `/pointcloud2d` or a user-specified one, and save it as `.pcd` format to a user-designated directory. 
+
 
 ## Usage
 
-To use this script, simply run at the top directory level of this package folder: 
+To use these script, simply run at the top directory level of this package folder: 
 ```
 python ros2_bag_to_image/extract_images_from_bag.py <path/to/bag> <output/path>
+python ros2_bag_to_image/extract_pointcloud_from_bag.py <path/to/bag> <output/path>
 ```
 
 ## Example
@@ -19,7 +24,9 @@ python ros2_bag_to_image/extract_images_from_bag.py <path/to/bag> <output/path>
 In this [Google Drive folder](https://drive.google.com/drive/folders/1pZpSstLPTSJcQ-2KaaZFc8NeBMKuVD_V), 
 we provide a collection of example ROS bags for the purpose of calibrating the camera intrinsic as well as the camera-LiDAR extrinsic, each of which contains many camera views and LiDAR scans. 
 
-Running the script mentioned above will generate an `/images` folder under the user-designated `/output/path` and extract all images in a bag into it in `.png` format, named using the timestamp of these images in the bag. 
+Running the image extraction script mentioned above will generate an `/images` folder under the user-designated `/output/path` and extract all images in a bag into it in `.png` format, named using the timestamp of these images in the bag. 
+
+Running the point cloud extraction script will create the `/output/path` and extract all point clouds in a bag into this directory in `.pcd` format, following a `cloud_<timestamp>.pcd` naming format. 
 
 # Option 2 - ROS Node for images
 
